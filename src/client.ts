@@ -1,4 +1,6 @@
 import {sendPost} from "./util";
+import {TritonGame} from "./game";
+import {TritonServer} from "./server";
 
 export class TritonClient {
     version: number;
@@ -56,11 +58,11 @@ export class TritonClient {
     }
 
     getGame(gameId: string) {
-        // TODO return new game
+        return new TritonGame(this, gameId);
     }
 
     getServer() {
-        // TODO return new server
+        return new TritonServer(this);
     }
 
     async serverRequest(type: string) {
@@ -101,15 +103,20 @@ export class TritonClient {
         }
     }
 
-    async gameRequest(type: string, gameId: string, options: {[key: string]: string|number}) {
+    async gameRequest(type: string, gameId: string, options?: {[key: string]: string|number}) {
         if(this.loggedIn) {
             const url = `${this.url}/grequest/${type}`;
-            const fields = {
+            let fields = {
                 type,
                 version: this.version,
                 game_number: gameId,
-                ...options
             };
+            if(options) {
+                fields = {
+                    ...fields,
+                    ...options
+                }
+            }
 
             const [result, response] = await sendPost(url, fields, this.authCookie);
 
