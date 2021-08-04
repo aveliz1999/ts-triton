@@ -1,5 +1,14 @@
 import {TritonClient} from "./client";
 
+type Action = 'Do Nothing' | 'Collect All' | 'Drop All' | 'Collect' | 'Drop' | 'Collect All But' | 'Drop All But' | 'Garrison Star'
+
+type ShipOrder = {
+    delay: number,
+    targetPlanetId: number,
+    action: Action,
+    ships: number
+}
+
 export class TritonGame {
     client: TritonClient;
     id: string;
@@ -58,5 +67,48 @@ export class TritonGame {
 
     buyScience(star: string, price: number) {
         return this.order('batched_orders', `upgrade_science,${star},${price}`);
+    }
+
+    giveShipOrder(shipId: number, orders: ShipOrder[]) {
+        return this.order('order', `add_fleet_orders,${shipId},${this.encodeShipOrders(orders)},0`)
+    }
+    
+    encodeShipOrders(orders: ShipOrder[]) {
+        let encoded = '';
+
+        // Encode the delays
+        encoded = orders.reduce((previous, current) => {
+            return previous + current.delay + '_'
+        }, '').slice(0, -1) + ',';
+
+        // Encode the target planets
+        encoded = encoded + orders.reduce((previous, current) => {
+            return previous + current.targetPlanetId + '_'
+        }, '').slice(0, -1) + ',';
+
+        // Encode the actions
+        encoded = encoded + orders.reduce((previous, current) => {
+            return previous + this.encodeAction(current.action) + '_'
+        }, '').slice(0, -1) + ',';
+
+        // Encode the ship amounts
+        encoded = encoded + orders.reduce((previous, current) => {
+            return previous + current.ships + '_'
+        }, '').slice(0, -1);
+
+        return encoded;
+    }
+
+    encodeAction(action: Action) {
+        switch(action) {
+            case 'Do Nothing': return 0;
+            case 'Collect All': return 1;
+            case 'Drop All': return 2;
+            case 'Collect': return 3;
+            case 'Drop': return 4;
+            case 'Collect All But': return 5;
+            case 'Drop All But': return 6;
+            case 'Garrison Star': return 7;
+        }
     }
 }
