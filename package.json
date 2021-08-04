@@ -1,9 +1,11 @@
 {
   "name": "ts-triton",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "repository": "https://github.com/aveliz1999/ts-triton",
+  "homepage": "https://github.com/aveliz1999/ts-triton",
   "scripts": {
     "prepublish": "tsc",
     "build": "tsc"
