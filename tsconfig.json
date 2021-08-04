@@ -8,9 +8,10 @@
     "moduleResolution": "node",
     "sourceMap": true,
     "outDir": "dist",
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "declaration": true
   },
   "lib": [
     "es2021"
-  ]
+  ],
 }
