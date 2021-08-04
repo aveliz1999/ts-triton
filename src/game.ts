@@ -27,7 +27,7 @@ export type UniverseData = {
     turn_based_time_out: number,
 
     fleets: {
-        [key: string]: {
+        [key: number]: {
             l: number,
             lx: string,
             ly: string,
@@ -42,7 +42,7 @@ export type UniverseData = {
         }
     },
     players: {
-        [key: string]: {
+        [key: number]: {
             ai: number,
             alias: string,
             avatar: number,
@@ -67,7 +67,7 @@ export type UniverseData = {
         }
     },
     stars: {
-        [key: string]: {
+        [key: number]: {
             n: string,
             puid: number,
             uid: number,
@@ -176,6 +176,21 @@ export class TritonGame {
         }, '').slice(0, -1);
 
         return encoded;
+    }
+
+    getStarsInDistance(starId: number) {
+        const hyperspaceLevel = this.currentUniverse.players[this.currentUniverse.player_uid].tech.propulsion.level;
+        const lightYears = hyperspaceLevel + 3;
+        const translatedDistance = lightYears / 8;
+
+        const originStar = this.currentUniverse.stars[starId];
+
+        return Object.values(this.currentUniverse.stars).filter(star => {
+            return Math.sqrt(
+                Math.pow(parseFloat(star.x) - parseFloat(originStar.x), 2) +
+                Math.pow(parseFloat(star.y) - parseFloat(originStar.y), 2)
+            ) <= translatedDistance;
+        });
     }
 
     encodeAction(action: Action) {
