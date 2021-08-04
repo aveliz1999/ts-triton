@@ -186,7 +186,7 @@ export class TritonGame {
         const originStar = this.currentUniverse.stars[starId];
 
         return Object.values(this.currentUniverse.stars).filter(star => {
-            return Math.sqrt(
+            return (star.uid !== originStar.uid) && Math.sqrt(
                 Math.pow(parseFloat(star.x) - parseFloat(originStar.x), 2) +
                 Math.pow(parseFloat(star.y) - parseFloat(originStar.y), 2)
             ) <= translatedDistance;
