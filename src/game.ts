@@ -151,7 +151,7 @@ export class TritonGame {
     giveShipOrder(shipId: number, orders: ShipOrder[]) {
         return this.order('order', `add_fleet_orders,${shipId},${this.encodeShipOrders(orders)},0`)
     }
-    
+
     encodeShipOrders(orders: ShipOrder[]) {
         let encoded = '';
 
@@ -185,11 +185,15 @@ export class TritonGame {
 
         const originStar = this.currentUniverse.stars[starId];
 
-        return Object.values(this.currentUniverse.stars).filter(star => {
-            return (star.uid !== originStar.uid) && Math.sqrt(
-                Math.pow(parseFloat(star.x) - parseFloat(originStar.x), 2) +
-                Math.pow(parseFloat(star.y) - parseFloat(originStar.y), 2)
-            ) <= translatedDistance;
+        return Object.values(this.currentUniverse.stars).map(star => {
+            return {
+                star,
+                distance: Math.sqrt(
+                    Math.pow(parseFloat(star.x) - parseFloat(originStar.x), 2) +
+                    Math.pow(parseFloat(star.y) - parseFloat(originStar.y), 2))
+            }
+        }).filter(result => {
+            return (result.star.uid !== originStar.uid) && result.distance <= translatedDistance;
         });
     }
 
