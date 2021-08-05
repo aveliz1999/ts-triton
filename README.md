@@ -26,7 +26,7 @@ sending orders.
 
 ### `TritonServer(client: TritonClient)`
 * `getPlayer()` - returns the player information
-* *getOpenGames() - returns the open game information
+* `getOpenGames()` - returns the open game information
 
 ### `TritonGame(client: TritonClient, gameId: string)`
 * `getFullUniverse()` - returns game universe information
