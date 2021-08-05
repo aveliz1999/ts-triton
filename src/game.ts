@@ -2,6 +2,15 @@ import {TritonClient} from "./client";
 
 type Action = 'Do Nothing' | 'Collect All' | 'Drop All' | 'Collect' | 'Drop' | 'Collect All But' | 'Drop All But' | 'Garrison Star'
 
+type Star = {
+    n: string,
+    puid: number,
+    uid: number,
+    v: string,
+    x: string,
+    y: string
+}
+
 export type UniverseData = {
     fleet_speed: number,
     paused: boolean,
@@ -67,14 +76,7 @@ export type UniverseData = {
         }
     },
     stars: {
-        [key: number]: {
-            n: string,
-            puid: number,
-            uid: number,
-            v: string,
-            x: string,
-            y: string
-        }
+        [key: string]: Star
     },
 }
 
@@ -152,7 +154,7 @@ export class TritonGame {
         return this.order('order', `add_fleet_orders,${shipId},${this.encodeShipOrders(orders)},0`)
     }
 
-    encodeShipOrders(orders: ShipOrder[]) {
+    encodeShipOrders(orders: ShipOrder[]): string {
         let encoded = '';
 
         // Encode the delays
@@ -178,26 +180,20 @@ export class TritonGame {
         return encoded;
     }
 
-    getStarsInDistance(starId: number) {
+    getStarsInDistance(starId: number): Star[] {
         const hyperspaceLevel = this.currentUniverse.players[this.currentUniverse.player_uid].tech.propulsion.level;
         const lightYears = hyperspaceLevel + 3;
         const translatedDistance = lightYears / 8;
 
         const originStar = this.currentUniverse.stars[starId];
 
-        return Object.values(this.currentUniverse.stars).map(star => {
-            return {
-                star,
-                distance: Math.sqrt(
-                    Math.pow(parseFloat(star.x) - parseFloat(originStar.x), 2) +
-                    Math.pow(parseFloat(star.y) - parseFloat(originStar.y), 2))
-            }
-        }).filter(result => {
-            return (result.star.uid !== originStar.uid) && result.distance <= translatedDistance;
+        return Object.values(this.currentUniverse.stars).filter(star => {
+            return (star.uid !== originStar.uid) &&
+                (this.getDistanceBetweenStars(originStar.uid, star.uid) <= translatedDistance);
         });
     }
 
-    encodeAction(action: Action) {
+    encodeAction(action: Action): number {
         switch(action) {
             case 'Do Nothing': return 0;
             case 'Collect All': return 1;
@@ -208,5 +204,92 @@ export class TritonGame {
             case 'Drop All But': return 6;
             case 'Garrison Star': return 7;
         }
+    }
+
+    getDistanceBetweenStars(startStarId: number, endStarId: number): number {
+        const startStar = this.currentUniverse.stars[startStarId];
+        const endStar = this.currentUniverse.stars[endStarId];
+        return Math.sqrt(
+            Math.pow(parseFloat(endStar.x) - parseFloat(startStar.x), 2) +
+            Math.pow(parseFloat(endStar.y) - parseFloat(startStar.y), 2))
+    }
+
+    findPathToStar(startStarId: number, endStarId: number): Star[] {
+        const stars = this.currentUniverse.stars;
+        const endStar = stars[endStarId];
+
+        const openList = [{
+            star: stars[startStarId],
+            f: 0,
+            g: 0,
+            h: 0,
+            visited: false,
+            closed: false,
+            parent: null
+        }];
+
+        while(openList.length > 0) {
+            let lowInd = 0;
+            for(let i = 0; i < openList.length; i++) {
+                if(openList[i].f < openList[lowInd].f) {
+                    lowInd = i;
+                }
+            }
+            const currentNode = openList[lowInd];
+
+            if(currentNode.star.uid === endStarId) {
+                let curr = currentNode;
+                const finalPath = [];
+                while(curr.parent) {
+                    finalPath.push(curr);
+                    curr = curr.parent;
+                }
+                return finalPath.reverse().map(r => r.star);
+            }
+
+            openList.splice(lowInd, 1);
+            currentNode.closed = true;
+
+            const neighbors = this.getStarsInDistance(currentNode.star.uid).map(star => {
+                return {
+                    star,
+                    f: 0,
+                    g: 0,
+                    h: 0,
+                    visited: false,
+                    closed: false,
+                    parent: null
+                }
+            });
+            for(let i = 0; i < neighbors.length; i++) {
+                const neighbor = neighbors[i];
+
+                if(neighbor.closed) {
+                    continue;
+                }
+
+                const gScore = currentNode.g + this.getDistanceBetweenStars(currentNode.star.uid, neighbor.star.uid);
+                let gScoreIsBest = false;
+
+                if(!neighbor.visited) {
+                    gScoreIsBest = true;
+                    neighbor.h = Math.abs(parseFloat(endStar.x) - parseFloat(neighbor.star.x)) +
+                        Math.abs(parseFloat(endStar.y) - parseFloat(neighbor.star.y));
+                    neighbor.visited = true;
+                    openList.push(neighbor);
+                }
+                else if(gScore < neighbor.g) {
+                    gScoreIsBest = true;
+                }
+
+                if(gScoreIsBest) {
+                    neighbor.parent = currentNode;
+                    neighbor.g = gScore;
+                    neighbor.f = neighbor.g + neighbor.h;
+                }
+            }
+        }
+
+        return [];
     }
 }
