@@ -1,5 +1,4 @@
 # ts-triton
-___
 
 A typescript client for the unpublished API for Neptune's Pride II: Triton (https://np.ironhelmet.com/)
 
@@ -7,7 +6,6 @@ The base mechanics were adapted from [phpTriton](https://github.com/wrenoud/phpT
 adding the capability of giving carriers orders.
 
 ## Usage
-___
 You can initialize the client, authenticate, and get a game like the following:
 ```ts
 import {TritonClient} from "ts-triton";
@@ -21,8 +19,6 @@ From there you can use the functions inside the game object to interact with the
 sending orders.
 
 ## Classes
-___
-
 ### `TritonClient(alias: string, password: string, version: number = 7)`
 * `authenticate()` - authenticates the player credentials, return true on success
 * `getGame(gameId: string)` - returns a `TritonGame` object to interact with the game that has that ID
