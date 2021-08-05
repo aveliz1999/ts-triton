@@ -214,7 +214,8 @@ export class TritonGame {
             Math.pow(parseFloat(endStar.y) - parseFloat(startStar.y), 2))
     }
 
-    findPathToStar(startStarId: number, endStarId: number): Star[] {
+    findPathToStar(startStarId: number, endStarId: number, allowedToCrossOtherPlayers: boolean = false,
+                   otherPlayerWeightMultiplied: number = 2): Star[] {
         const stars = this.currentUniverse.stars;
         const endStar = stars[endStarId];
 
@@ -267,8 +268,13 @@ export class TritonGame {
                 if(neighbor.closed) {
                     continue;
                 }
+                const otherPlayer = neighbor.star.puid !== this.currentUniverse.player_uid;
+                if(otherPlayer && !allowedToCrossOtherPlayers) {
+                    continue;
+                }
 
-                const gScore = currentNode.g + this.getDistanceBetweenStars(currentNode.star.uid, neighbor.star.uid);
+                const gScore = currentNode.g + (this.getDistanceBetweenStars(currentNode.star.uid, neighbor.star.uid) *
+                    (otherPlayer ? otherPlayerWeightMultiplied : 1));
                 let gScoreIsBest = false;
 
                 if(!neighbor.visited) {
