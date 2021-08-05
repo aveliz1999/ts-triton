@@ -3,12 +3,40 @@ import {TritonGame} from "./game";
 import {TritonServer} from "./server";
 
 export class TritonClient {
+    /**
+     * The version of the API.
+     */
     version: number;
+
+    /**
+     * The cookie to use for authenticating with the game.
+     * Set when you run {@link authenticate} and updated when succesful requests are made.
+     */
     authCookie: string;
+
+    /**
+     * If the client is logged in.
+     */
     loggedIn: boolean;
+
+    /**
+     * The alias to use to authenticate with the game.
+     */
     alias: string;
+
+    /**
+     * The password to use to authenticate with the game.
+     */
     password: string;
+
+    /**
+     * The base Neptune's Planet URL.
+     */
     url: string;
+
+    /**
+     * The error message returned when logging in.
+     */
     loginErrorMessage: string;
 
     constructor(alias: string, password: string, version: number = 7) {
@@ -20,6 +48,11 @@ export class TritonClient {
         this.url = "https://np.ironhelmet.com"
     }
 
+    /**
+     * Uses the given username and password to attempt to log in.
+     * Returns true if successful, and false if not.
+     * If it was not successful, the error message will be put in {@link loginErrorMessage}.
+     */
     async authenticate() {
         const url = `${this.url}/arequest/login`;
 
@@ -57,14 +90,27 @@ export class TritonClient {
         }
     }
 
+    /**
+     * Get a {@link TritonGame} instance for a game.
+     *
+     * @param gameId The ID of the game.
+     */
     getGame(gameId: string) {
         return new TritonGame(this, gameId);
     }
 
+    /**
+     * Get a {@link TritonServer} instance for the player.
+     */
     getServer() {
         return new TritonServer(this);
     }
 
+    /**
+     * Used for requests for the server.
+     *
+     * @param type The type of request
+     */
     async serverRequest(type: string) {
         if(this.loggedIn) {
             const url = `${this.url}/mrequest/${type}`;
@@ -103,6 +149,13 @@ export class TritonClient {
         }
     }
 
+    /**
+     * Used for requests for a game.
+     *
+     * @param type The type of request.
+     * @param gameId The ID of the game.
+     * @param options Extra options to include in the request body.
+     */
     async gameRequest(type: string, gameId: string, options?: {[key: string]: string|number}) {
         if(this.loggedIn) {
             const url = `${this.url}/grequest/${type}`;
