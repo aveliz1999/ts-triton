@@ -8,7 +8,14 @@ type Star = {
     uid: number,
     v: string,
     x: string,
-    y: string
+    y: string,
+    e?: number,
+    ga?: number,
+    i?: number,
+    nr?: number,
+    r?: number,
+    s?: number,
+    st?: number
 }
 
 export type UniverseData = {
