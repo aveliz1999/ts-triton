@@ -39,3 +39,7 @@ sending orders.
 * `buyIndustry(star: string, price: number)` - upgrade the industry on a planet
 * `buyScience(star: string, price: number)` - upgrade the science on a planet
 * `giveShipOrder(shipId: number, orders: ShipOrder[])` - give orders to ship carriers
+* `getStarsInDistance(starId: number): Star[]` - Get the stars in travel distance of another star for you
+* `getDistanceBetweenStars(startStarId: number, endStarId: number)` - Get the distance between two stars
+* `findPathToStar(startStarId: number, endStarId: number, allowedToCrossOtherPlayers: boolean = false,
+  otherPlayerWeightMultiplied: number = 2)` - Find a path of stars from one star to another
