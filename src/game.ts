@@ -258,6 +258,12 @@ export type UniverseData = {
             puid: number,
 
             /**
+             * The ID of the star the fleet is located at.
+             * Only present if this is the fleet is currently at a star.
+             */
+            ouid?: number,
+
+            /**
              * The number of ships in the fleet.
              */
             st: number,
