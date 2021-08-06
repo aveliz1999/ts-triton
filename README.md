@@ -35,6 +35,7 @@ sending orders.
 * `getPlayerAchievements()` - returns the player achievement information
 * `getDiplomacyMessages(count: number, offset: number = 0)` - returns the player's diplomacy messages
 * `getEventMessages(count: number, offset: number = 0)` - returns the player's event messages
+* `readMessage(messageKey: string)` - marks a message as read
 * `buyEconomy(star: string, price: number)` - upgrade the economy on a planet
 * `buyIndustry(star: string, price: number)` - upgrade the industry on a planet
 * `buyScience(star: string, price: number)` - upgrade the science on a planet

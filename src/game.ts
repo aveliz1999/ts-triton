@@ -583,6 +583,17 @@ export class TritonGame {
     }
 
     /**
+     * Marks a message as read.
+     *
+     * @param messageKey The message_key of the message.
+     */
+    readMessage(messageKey: string) {
+        return this.client.gameRequest('read_game_message', this.id, {
+            message_key: messageKey
+        })
+    }
+
+    /**
      * Buy economy on a star.
      *
      * @param star The ID of the star to buy on.
