@@ -3,12 +3,260 @@ import {TritonClient} from "./client";
 /**
  * The actions that a ship can do once it arrives at each planet.
  */
-type Action = 'Do Nothing' | 'Collect All' | 'Drop All' | 'Collect' | 'Drop' | 'Collect All But' | 'Drop All But' | 'Garrison Star'
+export type Action = 'Do Nothing' | 'Collect All' | 'Drop All' | 'Collect' | 'Drop' | 'Collect All But' | 'Drop All But' | 'Garrison Star'
+
+/**
+ * Represents a fleet in the game
+ */
+export type Fleet = {
+    /**
+     * Unknown.
+     */
+    l: number,
+
+    /**
+     * The X coordinate of the fleet at the previous tick.
+     */
+    lx: string,
+
+    /**
+     * The Y coordinate of the fleet at the previous tick.
+     */
+    ly: string,
+
+    /**
+     * The name of the carrier.
+     */
+    n: string,
+
+    /**
+     * The list of orders.
+     * Represented as an array of 4 number arrays.
+     *
+     * The number at position 0 represents the delay value in ticks for the order.
+     *
+     * The number at position 1 represents the ID of the star for the order.
+     *
+     * The number at position 2 represents the type of action for the order.
+     * @see Action
+     *
+     * The number at position 3 represents the number of ships for the order.
+     *
+     */
+    o: [number, number, number, number][],
+
+    /**
+     * The ID of the player who owns this fleet.
+     */
+    puid: number,
+
+    /**
+     * The ID of the star the fleet is located at.
+     * Only present if this is the fleet is currently at a star.
+     */
+    ouid?: number,
+
+    /**
+     * The number of ships in the fleet.
+     */
+    st: number,
+
+    /**
+     * The ID of this fleet.
+     */
+    uid: number,
+
+    /**
+     * If the fleet is travelling through a warpgate (at 3x speed).
+     * 0 = no
+     * 1 = yes
+     */
+    w: number,
+
+    /**
+     * The current X coordinate of the fleet.
+     */
+    x: string,
+
+    /**
+     * The current Y coordinate of the fleet.
+     */
+    y: string
+}
+
+/**
+ * Represents a technology owned by a player in the game
+ */
+export type Technology = {
+    /**
+     * Research cost per tech level for this technology.
+     * Only present if this is the player of the current user.
+     */
+    brr?: number,
+
+    /**
+     * Used to calculate value.
+     * Only present if this is the player of the current user.
+     */
+    bv?: number,
+
+    /**
+     * Used to calculate value.
+     * Only present if this is the player of the current user.
+     */
+    sv?: number,
+
+    /**
+     * Unknown.
+     */
+    value: number,
+
+    /**
+     * The current technology level.
+     */
+    level: number,
+
+    /**
+     * Current progress to the next level.
+     * Only present if this is the player of the current user.
+     */
+    research?: number
+}
+
+/**
+ * Represents a player in the game
+ */
+export type Player = {
+    /**
+     * If the player is currently controlled by an AI.
+     * 0 = no
+     * 1 = yes
+     */
+    ai: number,
+
+    /**
+     * The player's alias / display name.
+     */
+    alias: string,
+
+    /**
+     * The ID of the player's avatar.
+     */
+    avatar: number,
+
+    /**
+     * The current funds of the player.
+     * Only present if this is the player of the current user.
+     */
+    cash?: number,
+
+    /**
+     * The number of ticks until war begins with all the other players, if a permanent alliance has ended.
+     * Only present if this is the player of the current user.
+     */
+    countdown_to_war?: {
+        /**
+         * The key is the ID of the other player.
+         * The number is the number of ticks until the war begins.
+         */
+        [key: number]: number
+    },
+
+    /**
+     * If the player has exited the game.
+     * 0 = no
+     * 1 = conceded
+     * 2 = inactive
+     * 3 = total wipe out
+     */
+    conceded: number,
+
+    /**
+     * The ID of the player's home star
+     */
+    huid: number,
+
+    /**
+     * The number of renown the player has not yet given in the game.
+     */
+    karma_to_give: number,
+
+    /**
+     * The number of turns the player has missed.
+     */
+    missed_turns: number,
+
+    /**
+     * If the player's current turn has been submitted.
+     */
+    ready: number,
+
+    /**
+     * The AI's opinion of the player.
+     */
+    regard: number,
+
+    /**
+     * The technology currently being researched.
+     * Only present if this is the player of the current user.
+     */
+    researching?: string,
+
+    /**
+     * The technology being researched next.
+     * Only present if this is the player of the current user.
+     */
+    researching_next?: string,
+
+    /**
+     * The number of stars abandoned this production cycle.
+     * Cannot be higher than 1, resets to 0 at the next production cycle.
+     * Only present if this is the player of the current user.
+     */
+    stars_abandoned?: number,
+
+    /**
+     * The player's technology research information
+     */
+    tech: {
+        [key in 'banking' | 'manufacturing' | 'propulsion' | 'research' | 'scanning' | 'terraforming' | 'weapons']: Technology
+    },
+
+    /**
+     * The total economy of the player.
+     */
+    total_economy: number,
+
+    /**
+     * The total number of carriers of the player.
+     */
+    total_fleets: number,
+
+    /**
+     * The total industry of the player.
+     */
+    total_industry: number,
+
+    /**
+     * The total science of the player.
+     */
+    total_science: number,
+
+    /**
+     * The number of stars the player owns.
+     */
+    total_stars: number,
+
+    /**
+     * The number ships the player owns.
+     */
+    total_strength: number
+}
 
 /**
  * Represents a star in the game
  */
-type Star = {
+export type Star = {
     /**
      * The name of the star.
      */
@@ -215,81 +463,7 @@ export type UniverseData = {
         /**
          * The key is the ID of the fleet
          */
-        [key: number]: {
-            /**
-             * Unknown.
-             */
-            l: number,
-
-            /**
-             * The X coordinate of the fleet at the previous tick.
-             */
-            lx: string,
-
-            /**
-             * The Y coordinate of the fleet at the previous tick.
-             */
-            ly: string,
-
-            /**
-             * The name of the carrier.
-             */
-            n: string,
-
-            /**
-             * The list of orders.
-             * Represented as an array of 4 number arrays.
-             *
-             * The number at position 0 represents the delay value in ticks for the order.
-             *
-             * The number at position 1 represents the ID of the star for the order.
-             *
-             * The number at position 2 represents the type of action for the order.
-             * @see Action
-             *
-             * The number at position 3 represents the number of ships for the order.
-             *
-             */
-            o: [number, number, number, number][],
-
-            /**
-             * The ID of the player who owns this fleet.
-             */
-            puid: number,
-
-            /**
-             * The ID of the star the fleet is located at.
-             * Only present if this is the fleet is currently at a star.
-             */
-            ouid?: number,
-
-            /**
-             * The number of ships in the fleet.
-             */
-            st: number,
-
-            /**
-             * The ID of this fleet.
-             */
-            uid: number,
-
-            /**
-             * If the fleet is travelling through a warpgate (at 3x speed).
-             * 0 = no
-             * 1 = yes
-             */
-            w: number,
-
-            /**
-             * The current X coordinate of the fleet.
-             */
-            x: string,
-
-            /**
-             * The current Y coordinate of the fleet.
-             */
-            y: string
-        }
+        [key: number]: Fleet
     },
     /**
      * The list of players in the game.
@@ -298,166 +472,7 @@ export type UniverseData = {
         /**
          * The key is the ID of the player
          */
-        [key: number]: {
-            /**
-             * If the player is currently controlled by an AI.
-             * 0 = no
-             * 1 = yes
-             */
-            ai: number,
-
-            /**
-             * The player's alias / display name.
-             */
-            alias: string,
-
-            /**
-             * The ID of the player's avatar.
-             */
-            avatar: number,
-
-            /**
-             * The current funds of the player.
-             * Only present if this is the player of the current user.
-             */
-            cash?: number,
-
-            /**
-             * The number of ticks until war begins with all the other players, if a permanent alliance has ended.
-             * Only present if this is the player of the current user.
-             */
-            countdown_to_war?: {
-                /**
-                 * The key is the ID of the other player.
-                 * The number is the number of ticks until the war begins.
-                 */
-                [key: number]: number
-            },
-
-            /**
-             * If the player has exited the game.
-             * 0 = no
-             * 1 = conceded
-             * 2 = inactive
-             * 3 = total wipe out
-             */
-            conceded: number,
-
-            /**
-             * The ID of the player's home star
-             */
-            huid: number,
-
-            /**
-             * The number of renown the player has not yet given in the game.
-             */
-            karma_to_give: number,
-
-            /**
-             * The number of turns the player has missed.
-             */
-            missed_turns: number,
-
-            /**
-             * If the player's current turn has been submitted.
-             */
-            ready: number,
-
-            /**
-             * The AI's opinion of the player.
-             */
-            regard: number,
-
-            /**
-             * The technology currently being researched.
-             * Only present if this is the player of the current user.
-             */
-            researching?: string,
-
-            /**
-             * The technology being researched next.
-             * Only present if this is the player of the current user.
-             */
-            researching_next?: string,
-
-            /**
-             * The number of stars abandoned this production cycle.
-             * Cannot be higher than 1, resets to 0 at the next production cycle.
-             * Only present if this is the player of the current user.
-             */
-            stars_abandoned?: number,
-
-            /**
-             * The player's technology research information
-             */
-            tech: {
-                [key in 'banking' | 'manufacturing' | 'propulsion' | 'research' | 'scanning' | 'terraforming' | 'weapons']: {
-                    /**
-                     * Research cost per tech level for this technology.
-                     * Only present if this is the player of the current user.
-                     */
-                    brr?: number,
-
-                    /**
-                     * Used to calculate value.
-                     * Only present if this is the player of the current user.
-                     */
-                    bv?: number,
-
-                    /**
-                     * Used to calculate value.
-                     * Only present if this is the player of the current user.
-                     */
-                    sv?: number,
-
-                    /**
-                     * Unknown.
-                     */
-                    value: number,
-
-                    /**
-                     * The current technology level.
-                     */
-                    level: number,
-
-                    /**
-                     * Current progress to the next level.
-                     * Only present if this is the player of the current user.
-                     */
-                    research?: number
-                }
-            },
-
-            /**
-             * The total economy of the player.
-             */
-            total_economy: number,
-
-            /**
-             * The total number of carriers of the player.
-             */
-            total_fleets: number,
-
-            /**
-             * The total industry of the player.
-             */
-            total_industry: number,
-
-            /**
-             * The total science of the player.
-             */
-            total_science: number,
-
-            /**
-             * The number of stars the player owns.
-             */
-            total_stars: number,
-
-            /**
-             * The number ships the player owns.
-             */
-            total_strength: number
-        }
+        [key: number]: Player
     },
     /**
      * The stars in the game.
